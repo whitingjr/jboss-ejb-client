@@ -281,17 +281,16 @@ class ChannelAssociation {
      */
     MessageOutputStream acquireChannelMessageOutputStream() throws IOException {
         try {
-            this.channelWriteSemaphore.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new InterruptedIOException("Thread interrupted");
-        }
-        try {
+	        try {
+	            this.channelWriteSemaphore.acquire();
+	        } catch (InterruptedException e) {
+	            Thread.currentThread().interrupt();
+	            throw new InterruptedIOException("Thread interrupted");
+	        }
             return this.channel.writeMessage();
-        } catch (IOException e) {
+        } finally {
             // release
             this.channelWriteSemaphore.release();
-            throw e;
         }
     }
 
